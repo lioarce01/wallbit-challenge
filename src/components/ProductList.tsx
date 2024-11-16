@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { motion } from "framer-motion";
 import ProductSkeleton from "./Skeleton";
 import Image from "next/image";
+import Rating from "./Rating";
 
 interface ProductListProps {
   isFetching: boolean;
@@ -12,6 +13,7 @@ interface ProductListProps {
   searchId: string;
   product: any;
   addToCart: (product: any) => void;
+  productCount: number;
 }
 
 const ProductList: React.FC<ProductListProps> = ({
@@ -21,6 +23,7 @@ const ProductList: React.FC<ProductListProps> = ({
   searchId,
   product,
   addToCart,
+  productCount,
 }) => {
   return (
     <>
@@ -42,8 +45,8 @@ const ProductList: React.FC<ProductListProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <p className="bg-neutral-900 py-4 text-center text-sm md:text-lg text-red-700 font-bold rounded">
-              Product not found. Try searching a valid ID.
+            <p className="bg-neutral-900 py-4 text-center text-sm md:text-md text-red-700 font-bold rounded text-wrap px-2">
+              Product not found. Try searching by ID between 1 - {productCount}
             </p>
           </motion.div>
         )}
@@ -64,13 +67,16 @@ const ProductList: React.FC<ProductListProps> = ({
                 className="rounded-md h-auto w-auto"
               />
             )}
-            <div className="mt-2 sm:mt-0">
+            <div className="mt-2 sm:mt-0 space-y-2">
               <h3 className="font-semibold text-lg sm:text-xl">
                 {product.title}
               </h3>
-              <p className="text-gray-400 text-sm sm:text-base">
-                ${product?.price?.toFixed(2)}
-              </p>
+              <Rating product={product} />
+              <div className="flex space-x-4">
+                <p className="text-gray-400 text-sm sm:text-base">
+                  ${product?.price?.toFixed(2)}
+                </p>
+              </div>
             </div>
           </div>
           <Button

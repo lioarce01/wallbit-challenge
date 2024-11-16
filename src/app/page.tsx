@@ -8,6 +8,7 @@ import ProductList from "@/components/ProductList";
 import Cart from "@/components/Cart";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useCart } from "@/hooks/useCart";
+import { useGetAllProductsQuery } from "@/redux/api/productApi";
 
 export default function Shop() {
   const { cart, addToCart, removeFromCart, updateQuantity } = useCart();
@@ -21,6 +22,8 @@ export default function Shop() {
     handleSearch,
   } = useProductSearch(inputValue);
 
+  const { data: products } = useGetAllProductsQuery({});
+
   const createdAt = useSelector(
     (state: RootState) => state.cartState.createdAt
   );
@@ -29,6 +32,8 @@ export default function Shop() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  const productCount = products?.length;
 
   return (
     <div className="min-h-screen bg-neutral-950 text-gray-100 p-4 md:p-8">
@@ -50,6 +55,7 @@ export default function Shop() {
               searchId={searchId?.toString() || ""}
               product={product}
               addToCart={addToCart}
+              productCount={productCount}
             />
           </div>
         </div>
