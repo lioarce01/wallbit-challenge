@@ -39,7 +39,7 @@ export default function Shop() {
   return (
     <div className="min-h-screen flex flex-col bg-neutral-950 text-gray-100 p-4 md:p-8">
       <h1 className="text-4xl font-bold mb-8 text-center text-blue-500">
-        Wallbit Shop
+        wallbit shop
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-8 flex-grow pt-20">
