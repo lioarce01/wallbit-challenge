@@ -14,10 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetAllProductsQuery } from "@/redux/api/productApi";
-import { setProduct } from "@/redux/slices/productSlice";
+import { useGetProductByIdQuery } from "@/redux/api/productApi";
+import { setCart } from "@/redux/slices/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { RootState, AppDispatch } from "@/redux/store";
+import ProductSkeleton from "@/components/Skeleton";
 
 interface Product {
   id: number;
@@ -34,50 +35,52 @@ interface CartItem extends Product {
 }
 
 export default function Component() {
-  const { data, isLoading, error } = useGetAllProductsQuery({});
-  const { products } = useSelector((state: RootState) => state.productsState);
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const cart = useSelector((state: RootState) => state.cartState.cart);
+  const [inputValue, setInputValue] = useState<string>("");
   const [searchId, setSearchId] = useState<string>("");
-  const [searchResult, setSearchResult] = useState<Product | null>(null);
-  const dispatch = useDispatch();
+  const {
+    data: product,
+    isLoading: isProductLoading,
+    error: productError,
+    isFetching,
+  } = useGetProductByIdQuery(searchId ? parseInt(searchId, 10) : undefined, {
+    skip: !searchId,
+  });
 
-  useEffect(() => {
-    if (data) {
-      dispatch(setProduct(data));
+  const addToCart = (product: any) => {
+    const updatedCart = [...cart];
+    const existingItemIndex = updatedCart.findIndex(
+      (item) => item.id === product.id
+    );
+    if (existingItemIndex !== -1) {
+      updatedCart[existingItemIndex] = {
+        ...updatedCart[existingItemIndex],
+        quantity: updatedCart[existingItemIndex].quantity + 1,
+      };
+    } else {
+      updatedCart.push({ ...product, quantity: 1 });
     }
-  }, [data, dispatch]);
-
-  const addToCart = (product: Product) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prevCart, { ...product, quantity: 1 }];
-    });
+    dispatch(setCart(updatedCart));
   };
 
   const removeFromCart = (productId: number) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+    const updatedCart = cart.filter((item) => item.id !== productId);
+    dispatch(setCart(updatedCart));
   };
 
   const updateQuantity = (productId: number, newQuantity: number) => {
     if (newQuantity < 1) return;
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.id === productId ? { ...item, quantity: newQuantity } : item
-      )
+    const updatedCart = cart.map((item) =>
+      item.id === productId ? { ...item, quantity: newQuantity } : item
     );
+    dispatch(setCart(updatedCart));
   };
 
   const handleSearch = () => {
-    const id = parseInt(searchId, 10);
-    const product = products.find((p) => p.id === id);
-    setSearchResult(product || null);
+    if (inputValue) {
+      setSearchId(inputValue);
+    }
   };
 
   const totalPrice = cart.reduce(
@@ -98,10 +101,15 @@ export default function Component() {
             <div className="flex space-x-2">
               <Input
                 type="number"
-                value={searchId}
-                onChange={(e) => setSearchId(e.target.value)}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
                 placeholder="Enter product ID"
-                className="bg-neutral-800 text-white"
+                className="bg-neutral-800 text-white border-neutral-700 border-2 focus:border-neutral-600"
               />
               <Button
                 onClick={handleSearch}
@@ -111,84 +119,79 @@ export default function Component() {
                 Search
               </Button>
             </div>
-            {searchResult ? (
+
+            {(isFetching || isProductLoading) && <ProductSkeleton />}
+
+            {productError && (
+              <div className="mt-4 text-center text-red-700">
+                Error: {productError.toString()}
+              </div>
+            )}
+
+            {searchId &&
+              !isFetching &&
+              !isProductLoading &&
+              !product &&
+              !productError && (
+                <motion.div
+                  className="mt-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <p className="bg-neutral-900 py-4 text-center text-sm md:text-lg text-red-700 font-bold rounded">
+                    Product not found. Try searching a valid ID.
+                  </p>
+                </motion.div>
+              )}
+
+            {product && !isFetching && !isProductLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 bg-neutral-900 p-4 rounded-lg shadow-lg"
+                className="mt-4 bg-neutral-900 hover:bg-neutral-800 p-4 rounded-lg shadow-lg flex justify-between transition duration-300"
               >
                 <div className="flex items-center space-x-4">
-                  <Image
-                    src={searchResult.image}
-                    alt={searchResult.title}
-                    width={50}
-                    height={50}
-                    className="rounded-md"
-                  />
+                  {product.image && (
+                    <Image
+                      src={product.image}
+                      alt={product.title}
+                      width={50}
+                      height={50}
+                      className="rounded-md h-auto w-auto"
+                    />
+                  )}
                   <div>
-                    <h3 className="font-semibold">{searchResult.title}</h3>
+                    <h3 className="font-semibold">{product.title}</h3>
                     <p className="text-gray-400">
-                      ${searchResult.price.toFixed(2)}
+                      ${product?.price?.toFixed(2)}
                     </p>
                   </div>
                 </div>
                 <Button
-                  onClick={() => addToCart(searchResult)}
+                  onClick={() => addToCart(product)}
                   className="mt-2 bg-white text-neutral-950 hover:bg-gray-200"
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Add to Cart
                 </Button>
               </motion.div>
-            ) : (
-              <motion.div
-                className="mt-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <p className="bg-neutral-900 py-4 text-center text-red-700 font-bold rounded">
-                  Cannot find a product with the ID provided.
-                </p>
-              </motion.div>
             )}
-          </div>
-
-          <h2 className="text-2xl font-semibold mb-4">Products</h2>
-          <div className="grid gap-4">
-            {products.map((product) => (
-              <motion.div
-                key={product.id}
-                className="bg-neutral-900 p-4 rounded-lg shadow-lg flex items-center justify-between"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    width={50}
-                    height={50}
-                    className="rounded-md"
-                  />
-                  <div>
-                    <h3 className="font-semibold">{product.title}</h3>
-                    <p className="text-gray-400">${product.price.toFixed(2)}</p>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => addToCart(product)}
-                  className="bg-white text-neutral-950 hover:bg-gray-200"
-                >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Add to Cart
-                </Button>
-              </motion.div>
-            ))}
           </div>
         </div>
 
         <div>
           <h2 className="text-2xl font-semibold mb-4">Your Cart</h2>
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:none">
+                <TableHead className="w-[40%]">Product</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+          </Table>
           <AnimatePresence>
             {cart.length > 0 ? (
               <motion.div
@@ -197,15 +200,6 @@ export default function Component() {
                 exit={{ opacity: 0, y: 20 }}
               >
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[40%]">Product</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead className="w-[50px]"></TableHead>
-                    </TableRow>
-                  </TableHeader>
                   <TableBody>
                     {cart.map((item) => (
                       <TableRow key={item.id}>
@@ -231,7 +225,7 @@ export default function Component() {
                               }
                               aria-label={`Decrease quantity of ${item.title}`}
                             >
-                              <Minus className="w-4 h-4" />
+                              <Minus className="w-4 h-4 text-neutral-950" />
                             </Button>
                             <Input
                               type="number"
@@ -253,13 +247,13 @@ export default function Component() {
                               }
                               aria-label={`Increase quantity of ${item.title}`}
                             >
-                              <Plus className="w-4 h-4" />
+                              <Plus className="w-4 h-4 text-neutral-950" />
                             </Button>
                           </div>
                         </TableCell>
-                        <TableCell>${item.price.toFixed(2)}</TableCell>
+                        <TableCell>${item?.price?.toFixed(2)}</TableCell>
                         <TableCell>
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ${(item.price * item.quantity)?.toFixed(2)}
                         </TableCell>
                         <TableCell>
                           <Button
@@ -277,7 +271,7 @@ export default function Component() {
                 </Table>
                 <div className="mt-4 flex justify-between items-center">
                   <p className="text-xl font-semibold">
-                    Total: ${totalPrice.toFixed(2)}
+                    Total: ${totalPrice?.toFixed(2)}
                   </p>
                   <Button className="bg-white text-neutral-950 hover:bg-gray-200">
                     Proceed to Checkout
@@ -286,12 +280,12 @@ export default function Component() {
               </motion.div>
             ) : (
               <motion.p
-                className="text-gray-400 text-center"
+                className="text-gray-400 text-center py-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                Your cart is empty
+                Your cart is empty. Try adding new items to cart.
               </motion.p>
             )}
           </AnimatePresence>

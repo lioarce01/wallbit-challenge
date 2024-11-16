@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import { productsApi } from "./api/productApi";
-import productsReducer from "./slices/productSlice";
+import cartReducer from "./slices/cartSlice";
 
 const createNoopStorage = () => {
   return {
@@ -26,12 +26,12 @@ const storage =
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["product"],
+  whitelist: ["cartState"],
 };
 
 const rootReducer = combineReducers({
   [productsApi.reducerPath]: productsApi.reducer,
-  productsState: productsReducer,
+  cartState: cartReducer,
 });
 
 const localStorage = persistReducer(persistConfig, rootReducer);
