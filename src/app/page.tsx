@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
-import { useGetProductByIdQuery } from "@/redux/api/productApi";
-import { setCart } from "@/redux/slices/cartSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import SearchBar from "@/components/SearchBar";
 import ProductList from "@/components/ProductList";
 import Cart from "@/components/Cart";
@@ -14,6 +11,7 @@ import { useCart } from "@/hooks/useCart";
 
 export default function Shop() {
   const { cart, addToCart, removeFromCart, updateQuantity } = useCart();
+  const [inputValue, setInputValue] = useState<string>("");
   const {
     searchId,
     product,
@@ -21,8 +19,8 @@ export default function Shop() {
     productError,
     isFetching,
     handleSearch,
-    setSearchId,
-  } = useProductSearch();
+  } = useProductSearch(inputValue);
+
   const createdAt = useSelector(
     (state: RootState) => state.cartState.createdAt
   );
@@ -40,16 +38,16 @@ export default function Shop() {
         <div>
           <div className="mb-6">
             <SearchBar
-              inputValue={searchId}
+              inputValue={inputValue}
               handleSearch={handleSearch}
-              setInputValue={setSearchId}
+              setInputValue={setInputValue}
             />
 
             <ProductList
               isFetching={isFetching}
               isProductLoading={isProductLoading}
               productError={productError}
-              searchId={searchId}
+              searchId={searchId?.toString() || ""}
               product={product}
               addToCart={addToCart}
             />

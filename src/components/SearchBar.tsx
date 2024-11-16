@@ -14,6 +14,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
   setInputValue,
   handleSearch,
 }) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && inputValue.trim() !== "") {
+      handleSearch();
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+  };
+
   return (
     <>
       <h2 className="text-2xl font-semibold mb-4">Search Product by ID</h2>
@@ -21,12 +32,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Input
           type="number"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSearch();
-            }
-          }}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           placeholder="Enter product ID"
           className="bg-neutral-800 text-white border-neutral-700 border-2 focus:border-neutral-600"
         />
