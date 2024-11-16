@@ -22,8 +22,8 @@ Follow these steps to set up the project on your local machine:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/e-commerce-cart-app.git
-cd e-commerce-cart-app
+git clone https://github.com/lioarce01/wallbit-challenge.git
+cd wallbit-challenge
 ```
 
 ### 2. Install dependencies
@@ -51,4 +51,3 @@ The app provides an intuitive interface for managing your shopping cart:
 - Adjust quantities using the +/- buttons
 - Remove items with the "Remove" button
 - View total price and proceed to checkout
-
