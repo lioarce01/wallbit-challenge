@@ -28,7 +28,7 @@ const CartList: React.FC<CartListProps> = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
         >
-          <div className="hidden md:block">
+          <div className="hidden md:block overflow-y-scroll max-h-[480px]">
             <Table>
               <TableBody>
                 {cart.map((item: any) => (
@@ -101,7 +101,7 @@ const CartList: React.FC<CartListProps> = ({
             </Table>
           </div>
 
-          <div className="md:hidden">
+          <div className="md:hidden overflow-y-scroll max-h-[450px] px-4">
             {cart.map((item: any) => (
               <div
                 key={item.id}

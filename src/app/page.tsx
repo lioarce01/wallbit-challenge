@@ -9,6 +9,7 @@ import Cart from "@/components/Cart";
 import { useProductSearch } from "@/hooks/useProductSearch";
 import { useCart } from "@/hooks/useCart";
 import { useGetAllProductsQuery } from "@/redux/api/productApi";
+import Footer from "@/components/Footer";
 
 export default function Shop() {
   const { cart, addToCart, removeFromCart, updateQuantity } = useCart();
@@ -36,10 +37,12 @@ export default function Shop() {
   const productCount = products?.length;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-gray-100 p-4 md:p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">Shopping Cart</h1>
+    <div className="min-h-screen flex flex-col bg-neutral-950 text-gray-100 p-4 md:p-8">
+      <h1 className="text-4xl font-bold mb-8 text-center text-blue-500">
+        Wallbit Shop
+      </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-8 flex-grow pt-20">
         <div>
           <div className="mb-6">
             <SearchBar
@@ -70,6 +73,7 @@ export default function Shop() {
           />
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

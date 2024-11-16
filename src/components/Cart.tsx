@@ -22,7 +22,7 @@ const Cart: React.FC<CartProps> = ({
   totalPrice,
 }) => {
   return (
-    <div className="px-4 py-6">
+    <div className="px-4">
       <div className="flex flex-col md:flex-row w-full justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold mb-4 md:mb-0">Your Cart</h2>
         <h2 className="text-lg font-semibold mb-4 text-neutral-300">
