@@ -52,9 +52,9 @@ const ProductList: React.FC<ProductListProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-4 bg-neutral-900 hover:bg-neutral-800 p-4 rounded-lg shadow-lg flex justify-between transition duration-300"
+          className="mt-4 bg-neutral-900 hover:bg-neutral-800 p-4 rounded-lg shadow-lg flex flex-col sm:flex-row justify-between md:items-center transition duration-300"
         >
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 sm:flex-row flex-col ">
             {product.image && (
               <Image
                 src={product.image}
@@ -64,14 +64,18 @@ const ProductList: React.FC<ProductListProps> = ({
                 className="rounded-md h-auto w-auto"
               />
             )}
-            <div>
-              <h3 className="font-semibold">{product.title}</h3>
-              <p className="text-gray-400">${product?.price?.toFixed(2)}</p>
+            <div className="mt-2 sm:mt-0">
+              <h3 className="font-semibold text-lg sm:text-xl">
+                {product.title}
+              </h3>
+              <p className="text-gray-400 text-sm sm:text-base">
+                ${product?.price?.toFixed(2)}
+              </p>
             </div>
           </div>
           <Button
             onClick={() => addToCart(product)}
-            className="mt-2 bg-white text-neutral-950 hover:bg-gray-200"
+            className="mt-2 sm:mt-0 bg-white text-neutral-950 hover:bg-gray-200"
           >
             <ShoppingCart className="w-4 h-4 mr-2" />
             Add to Cart

@@ -31,10 +31,10 @@ export default function Shop() {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-gray-100 p-8">
+    <div className="min-h-screen bg-neutral-950 text-gray-100 p-4 md:p-8">
       <h1 className="text-4xl font-bold mb-8 text-center">Shopping Cart</h1>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div className="mb-6">
             <SearchBar
@@ -54,13 +54,15 @@ export default function Shop() {
           </div>
         </div>
 
-        <Cart
-          cart={cart}
-          createdAt={createdAt ? createdAt : null}
-          updateQuantity={updateQuantity}
-          removeFromCart={removeFromCart}
-          totalPrice={totalPrice}
-        />
+        <div className="md:mt-0">
+          <Cart
+            cart={cart}
+            createdAt={createdAt ? createdAt : null}
+            updateQuantity={updateQuantity}
+            removeFromCart={removeFromCart}
+            totalPrice={totalPrice}
+          />
+        </div>
       </div>
     </div>
   );

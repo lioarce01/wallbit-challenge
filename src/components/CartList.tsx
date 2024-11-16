@@ -28,73 +28,146 @@ const CartList: React.FC<CartListProps> = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
         >
-          <Table>
-            <TableBody>
-              {cart.map((item: any) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center space-x-2">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={40}
-                        height={40}
-                        className="rounded-md h-auto w-auto"
-                      />
-                      <span>{item.title}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
+          <div className="hidden md:block">
+            <Table>
+              <TableBody>
+                {cart.map((item: any) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center space-x-2">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          width={40}
+                          height={40}
+                          className="rounded-md h-auto w-auto"
+                        />
+                        <span>{item.title}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
+                          aria-label={`Decrease quantity of ${item.title}`}
+                        >
+                          <Minus className="w-4 h-4 text-neutral-950" />
+                        </Button>
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateQuantity(
+                              item.id,
+                              parseInt(e.target.value, 10)
+                            )
+                          }
+                          className="w-16 text-center"
+                          aria-label={`Quantity of ${item.title}`}
+                        />
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                          aria-label={`Increase quantity of ${item.title}`}
+                        >
+                          <Plus className="w-4 h-4 text-neutral-950" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>${item?.price?.toFixed(2)}</TableCell>
+                    <TableCell>
+                      ${(item.price * item.quantity)?.toFixed(2)}
+                    </TableCell>
+                    <TableCell>
                       <Button
                         size="icon"
-                        variant="outline"
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
-                        }
-                        aria-label={`Decrease quantity of ${item.title}`}
+                        variant="ghost"
+                        onClick={() => removeFromCart(item.id)}
+                        aria-label={`Remove ${item.title} from cart`}
                       >
-                        <Minus className="w-4 h-4 text-neutral-950" />
+                        <Trash2 className="w-4 h-4" />
                       </Button>
-                      <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateQuantity(item.id, parseInt(e.target.value, 10))
-                        }
-                        className="w-16 text-center"
-                        aria-label={`Quantity of ${item.title}`}
-                      />
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
-                        }
-                        aria-label={`Increase quantity of ${item.title}`}
-                      >
-                        <Plus className="w-4 h-4 text-neutral-950" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>${item?.price?.toFixed(2)}</TableCell>
-                  <TableCell>
-                    ${(item.price * item.quantity)?.toFixed(2)}
-                  </TableCell>
-                  <TableCell>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="md:hidden">
+            {cart.map((item: any) => (
+              <div
+                key={item.id}
+                className="bg-neutral-900 p-4 mb-4 rounded-lg shadow-lg"
+              >
+                <div className="flex items-center space-x-4">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    width={40}
+                    height={40}
+                    className="rounded-md h-auto w-auto"
+                  />
+                  <div>
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="text-sm text-gray-400">
+                      ${item?.price?.toFixed(2)}
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      Subtotal: ${(item.price * item.quantity)?.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
                     <Button
                       size="icon"
-                      variant="ghost"
-                      onClick={() => removeFromCart(item.id)}
-                      aria-label={`Remove ${item.title} from cart`}
+                      variant="outline"
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      aria-label={`Decrease quantity of ${item.title}`}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Minus className="w-4 h-4 text-neutral-950" />
                     </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <Input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        updateQuantity(item.id, parseInt(e.target.value, 10))
+                      }
+                      className="w-16 text-center"
+                      aria-label={`Quantity of ${item.title}`}
+                    />
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      aria-label={`Increase quantity of ${item.title}`}
+                    >
+                      <Plus className="w-4 h-4 text-neutral-950" />
+                    </Button>
+                  </div>
+
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => removeFromCart(item.id)}
+                    aria-label={`Remove ${item.title} from cart`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
           <div className="mt-4 flex justify-between items-center">
             <p className="text-xl font-semibold">
               Total: ${totalPrice?.toFixed(2)}
